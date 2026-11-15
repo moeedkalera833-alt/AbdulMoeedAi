@@ -1,5 +1,4 @@
 
-
 name: Build Abdul Moeed AI APK
 
 on:
@@ -23,7 +22,10 @@ jobs:
           java-version: '17'
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          accept-android-sdk-licenses: true
+          log-accepted-android-sdk-licenses: false
 
       - name: Install Android SDK
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
@@ -41,3 +43,4 @@ jobs:
         with:
           name: AbdulMoeedAI-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          
