@@ -30,7 +30,7 @@ jobs:
       - name: Extract App ZIP
         run: |
           mkdir -p app
-          unzip -o 4.app.zip -d /tmp/app_extract
+          unzip -o 4.app.zip.zip -d /tmp/app_extract
           if [ -f /tmp/app_extract/build.gradle ] || [ -f /tmp/app_extract/build.gradle.kts ]; then
             cp -a /tmp/app_extract/. app/
           elif [ -f /tmp/app_extract/app/build.gradle ] || [ -f /tmp/app_extract/app/build.gradle.kts ]; then
