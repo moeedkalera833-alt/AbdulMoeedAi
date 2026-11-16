@@ -23,12 +23,23 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
-        with:
-          accept-android-sdk-licenses: true
-          log-accepted-android-sdk-licenses: false
 
-      - name: Accept Android SDK Licenses
+      - name: Accept SDK Licenses
         run: yes | sdkmanager --licenses
+
+      - name: Extract App ZIP
+        run: |
+          mkdir -p app
+          unzip -o 4.app.zip -d /tmp/app_extract
+          if [ -f /tmp/app_extract/build.gradle ] || [ -f /tmp/app_extract/build.gradle.kts ]; then
+            cp -a /tmp/app_extract/. app/
+          elif [ -f /tmp/app_extract/app/build.gradle ] || [ -f /tmp/app_extract/app/build.gradle.kts ]; then
+            cp -a /tmp/app_extract/app/. app/
+          else
+            echo "App Gradle file not found in ZIP"
+            find /tmp/app_extract -maxdepth 4 -type f
+            exit 1
+          fi
 
       - name: Install Android SDK
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
