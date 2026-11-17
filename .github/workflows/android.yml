@@ -25,25 +25,38 @@ jobs:
         uses: android-actions/setup-android@v4
 
       - name: Accept SDK Licenses
-        run: yes | sdkmanager --licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Extract App ZIP
+      - name: Install Android SDK
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extract Android project
         run: |
-          mkdir -p app
           unzip -o 4.App.zip.zip -d /tmp/app_extract
-          if [ -f /tmp/app_extract/build.gradle ] || [ -f /tmp/app_extract/build.gradle.kts ]; then
-            cp -a /tmp/app_extract/. app/
-          elif [ -f /tmp/app_extract/app/build.gradle ] || [ -f /tmp/app_extract/app/build.gradle.kts ]; then
-            cp -a /tmp
+
+          APP_GRADLE="$(find /tmp/app_extract -type f \( -path '*/app/build.gradle' -o -path '*/app/build.gradle.kts' \) -print -quit)"
+
+          if [ -z "$APP_GRADLE" ]; then
+            echo "app/build.gradle not found in ZIP"
+            find /tmp/app_extract -maxdepth 7 -type f
+            exit 1
+          fi
+
+          PROJECT_DIR="$(dirname "$(dirname "$APP_GRADLE")")"
+
+          cp -a "$PROJECT_DIR"/. "$GITHUB_WORKSPACE"/
+
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build 
+      - name: Build APK
+        run: gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: AbdulMoeedAI-APK
           path: app/build/outputs/apk/debug/app-debug.apk
-          
+          if-no-files-found: error
