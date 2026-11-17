@@ -34,23 +34,12 @@ jobs:
           if [ -f /tmp/app_extract/build.gradle ] || [ -f /tmp/app_extract/build.gradle.kts ]; then
             cp -a /tmp/app_extract/. app/
           elif [ -f /tmp/app_extract/app/build.gradle ] || [ -f /tmp/app_extract/app/build.gradle.kts ]; then
-            cp -a /tmp/app_extract/app/. app/
-          else
-            echo "App Gradle file not found in ZIP"
-            find /tmp/app_extract -maxdepth 4 -type f
-            exit 1
-          fi
-
-      - name: Install Android SDK
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
-      - name: Setup Gradle
+            cp -a /tmp
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
 
-      - name: Build APK
-        run: gradle assembleDebug
+      - name: Build 
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
